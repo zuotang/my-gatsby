@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
+    "cannon": "^0.6.2",
     "gatsby": "^2.13.42",
     "gatsby-image": "^2.2.7",
     "gatsby-plugin-manifest": "^2.2.4",
@@ -20,7 +21,10 @@
     "styled-components": "^4.3.2"
   },
   "devDependencies": {
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "react-three": "^0.9.7",
+    "react-three-fiber": "^2.3.6",
+    "three": "^0.107.0"
   },
   "keywords": [
     "gatsby"
