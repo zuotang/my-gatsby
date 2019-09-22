@@ -1,16 +1,18 @@
-import React from "react"
-import Layout from '../components/layout'
-import A from '../components/a'
-import B from '../components/b'
-import useBaseSize from "../components/baseSize";
+import React, { useState } from 'react';
+import Layout from '../components/layout';
+import FileManager from '../components/fileManager/Manager';
+import Button from '@material-ui/core/Button';
 
 const IndexPage = () => {
-  useBaseSize()
-  return (
-    <Layout>
-      <A />
-      <B />
-    </Layout>
-)}
+	const [ open, setOpen ] = useState(false);
+	return (
+		<Layout autoSize={false}>
+			<Button variant="outlined" color="primary" onClick={(e) => setOpen(true)}>
+				文件管理
+			</Button>
+			<FileManager open={open} onClose={(e) => setOpen(false)} />
+		</Layout>
+	);
+};
 
-export default IndexPage
+export default IndexPage;
