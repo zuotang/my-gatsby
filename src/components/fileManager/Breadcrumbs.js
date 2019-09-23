@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 function getPathList(path) {
 	let list = [];
-	if (path != '/') {
+	if (path !== '/') {
 		while (path) {
 			let index = path.lastIndexOf('/');
 			let name = path.substring(index + 1);
@@ -49,7 +49,7 @@ function getPathList(path) {
 	return list;
 }
 
-export default function CustomizedBreadcrumbs({ path, onChange }) {
+export default function CustomizedBreadcrumbs({ path, onChange,onMenu }) {
 	const classes = useStyles();
 	let pathList = getPathList(path);
 	const current = pathList.pop();
@@ -89,9 +89,7 @@ export default function CustomizedBreadcrumbs({ path, onChange }) {
 					<StyledBreadcrumb
 						label={current.name}
 						deleteIcon={<ExpandMoreIcon />}
-						onDelete={(e) => {
-							console.log('test');
-						}}
+						onDelete={onMenu}
 					/>
 				)}
 			</Breadcrumbs>

@@ -12,9 +12,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Breadcrumbs from './Breadcrumbs';
 import Fab from '@material-ui/core/Fab';
-import BastItem, { getTypeObj } from './Item';
+import BastItem, { handleFileClick } from './Item';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import { ItemMenu } from './Menu';
+
 
 //import Item from './Item';
 import { Grid } from 'react-virtualized';
@@ -25,16 +27,37 @@ const Contents = styled.div``;
 
 const Actions = styled.div`display: flex;`;
 
+
+
 function Manager({ open, onClose }) {
 	//文件列表
 	const [ gridList, setGridList ] = useState([]);
 	const [ href, setHref ] = useState('/');
+	const [anchorEl, setAnchorEl] = React.useState(null);
 	const { data, loading } = useAutoQuery(getDirContents, {
 		path: href
 	});
 	const columnLen = 5;
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+	useEffect(() => {
+		//鼠标右键菜单
+		function handleContextMenu(e){
+			e.preventDefault();
+			let target=document.activeElement;
+			if(target && target.getAttribute('d_type')){
+				setAnchorEl(target)
+			}else{
+				setAnchorEl(null)
+			}
+			console.log('右键')
+		}
+		document.addEventListener('contextmenu',handleContextMenu);
+		return ()=>{
+			document.removeEventListener('contextmenu',handleContextMenu)
+		}
+	},[]);
 
 	useEffect(
 		() => {
@@ -45,6 +68,9 @@ function Manager({ open, onClose }) {
 		},
 		[ data.list ]
 	);
+	function handleMenuClose(e) {
+		setAnchorEl(null);
+	}
 
 	function handleClose(e) {
 		onClose();
@@ -55,14 +81,15 @@ function Manager({ open, onClose }) {
 	function push(path) {
 		setHref(path);
 	}
-
-	let isBack = !(href == '/' || href == '');
+	
+	let isBack = !(href === '/' || href === '');
 
 	function cellRenderer({ columnIndex, key, rowIndex, style }) {
 		let item = gridList[rowIndex][columnIndex];
 		if (!item) return null;
-		const itemObj = getTypeObj({ ...item, push });
-		return <BastItem key={itemObj.filename} style={style} {...itemObj} />;
+		return <BastItem key={item.filename} style={style}  {...item} onClick={e=>{
+			handleFileClick(item,push)
+		}}/>;
 	}
 
 	return (
@@ -80,11 +107,26 @@ function Manager({ open, onClose }) {
 						>
 							<ChevronLeft />
 						</Fab>
-						<Breadcrumbs path={href} onChange={push} />
+						<Breadcrumbs path={href} onChange={push} onMenu={e=>setAnchorEl(e.target)} />
 					</Actions>
 					{loading && <LinearProgress />}
 				</DialogTitle>
 				<DialogContent>
+					<ItemMenu  
+					anchorEl={anchorEl}
+					handleOpen={e=>{
+						let item={
+							type:anchorEl.getAttribute('d_type'),
+							filename:anchorEl.getAttribute('d_filename'),
+							basename:anchorEl.getAttribute('d_basename')
+						}
+						handleFileClick(item,push)
+						setAnchorEl(null);
+					}} 
+					handleMenuClose={e=>{
+
+					}}
+					/>
 					<Contents>
 						{gridList.length > 0 && (
 							<Grid
@@ -94,17 +136,17 @@ function Manager({ open, onClose }) {
 								height={600}
 								rowCount={gridList.length}
 								rowHeight={800 / columnLen}
-								width={800}
+								width={820}
 							/>
 						)}
 					</Contents>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleClose} color="primary">
-						Disagree
+						取消
 					</Button>
 					<Button onClick={handleClose} color="primary" autoFocus>
-						Agree
+						确定
 					</Button>
 				</DialogActions>
 			</Dialog>
