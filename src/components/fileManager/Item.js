@@ -8,6 +8,7 @@ import zipIcon from '../../images/icons/zip.png';
 import htmlIcon from '../../images/icons/html.png';
 import textIcon from '../../images/icons/text.png';
 import styled from 'styled-components';
+import calssNames from 'classnames';
 
 const File = styled.div`
 	word-break: break-word;
@@ -18,7 +19,7 @@ const File = styled.div`
 		&:hover {
 			background-color: rgba(0, 0, 0, 0.1);
 		}
-		&:focus{
+		&.active{
 			background-color: rgba(0, 0, 0, 0.2);		
 		}
 		margin: 20px;
@@ -51,7 +52,7 @@ const ImageThumb=React.memo(function({url}){
 function getExt(name){
 	return name.substring(name.lastIndexOf('.') + 1).toLowerCase();
 }
-
+//处理图标
 export function getIcon(item){
 	if (item.type === 'directory') {
 		return folderIcon;
@@ -74,7 +75,7 @@ export function getIcon(item){
 		}
 	}
 }
-
+//处理文件打开
 export function handleFileClick(item,push){
 	function openWindow(e){
 		window.open(`http://home.tangzuo.cc:8282${item.filename}`, '_blank');
@@ -98,8 +99,8 @@ export function handleFileClick(item,push){
 }
 
 
-const BastItem=React.memo(function({ onClick, style,...item }) {
-	let icon=getIcon(item);
+const BastItem=React.memo(function({ onOpen,onSelect, style,active,data }) {
+	let icon=getIcon(data);
 	let iconElement;
 	//图标渲染
 	if(typeof icon==="object" && icon.props){
@@ -110,16 +111,16 @@ const BastItem=React.memo(function({ onClick, style,...item }) {
 	return (
 		<File style={style}   >
 			<div 
-			d_type={item.type} 
-			d_basename={item.basename} 
-			d_filename={item.filename} 
+			d_type={data.type} 
+			d_basename={data.basename} 
+			d_filename={data.filename} 
 			tabIndex="0" 
-			title={item.filename}  
-			className="item" 
-			onDoubleClick={onClick} 
+			className={calssNames("item",active && 'active')} 
+			onDoubleClick={onOpen} 
+			onClick={onSelect}
 			draggable >
 				{iconElement}
-				<div className="title">{item.basename}</div>
+				<div className="title">{data.basename}</div>
 			</div>
 		</File>
 	);

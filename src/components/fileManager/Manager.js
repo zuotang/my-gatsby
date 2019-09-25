@@ -15,10 +15,9 @@ import Fab from '@material-ui/core/Fab';
 import BastItem, { handleFileClick } from './Item';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
-import { ItemMenu } from './Menu';
+import { ItemMenu,useMenu} from './Menu';
+import useFileRouter from './FileRouter';
 
-
-//import Item from './Item';
 import { Grid } from 'react-virtualized';
 
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
@@ -28,37 +27,21 @@ const Contents = styled.div``;
 const Actions = styled.div`display: flex;`;
 
 
-
 function Manager({ open, onClose }) {
-	//文件列表
+	//ui主题
+	const theme = useTheme();
+	const fileRouter=useFileRouter();
+	//选择的文件
+	const [select,setSelect]=useState({});
+
+	//文件列表数据
 	const [ gridList, setGridList ] = useState([]);
-	const [ href, setHref ] = useState('/');
-	const [anchorEl, setAnchorEl] = React.useState(null);
+	
+	//请求接口
 	const { data, loading } = useAutoQuery(getDirContents, {
-		path: href
+		path: fileRouter.path
 	});
 	const columnLen = 5;
-	const theme = useTheme();
-	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-	useEffect(() => {
-		//鼠标右键菜单
-		function handleContextMenu(e){
-			e.preventDefault();
-			let target=document.activeElement;
-			if(target && target.getAttribute('d_type')){
-				setAnchorEl(target)
-			}else{
-				setAnchorEl(null)
-			}
-			console.log('右键')
-		}
-		document.addEventListener('contextmenu',handleContextMenu);
-		return ()=>{
-			document.removeEventListener('contextmenu',handleContextMenu)
-		}
-	},[]);
-
 	useEffect(
 		() => {
 			if (data.list) {
@@ -68,27 +51,35 @@ function Manager({ open, onClose }) {
 		},
 		[ data.list ]
 	);
-	function handleMenuClose(e) {
-		setAnchorEl(null);
-	}
+	
+	
+	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 	function handleClose(e) {
 		onClose();
 	}
-	function back() {
-		setHref(href.substring(0, href.lastIndexOf('/')));
-	}
-	function push(path) {
-		setHref(path);
-	}
-	
-	let isBack = !(href === '/' || href === '');
+
+	const menu=useMenu(fileRouter.push);
+
 
 	function cellRenderer({ columnIndex, key, rowIndex, style }) {
-		let item = gridList[rowIndex][columnIndex];
-		if (!item) return null;
-		return <BastItem key={item.filename} style={style}  {...item} onClick={e=>{
-			handleFileClick(item,push)
+		let data = gridList[rowIndex][columnIndex];
+		if (!data) return null;
+		return <BastItem 
+		active={!!select[data.filename]}
+		key={data.filename} 
+		style={style}  
+		data={data} 
+		onSelect={e=>{
+			//是否被选择
+			if(!select[data.filename]){
+				setSelect({...select,[data.filename]:data});
+			}else{
+				setSelect({...select,[data.filename]:null});
+			}
+		}}
+		onOpen={e=>{
+			handleFileClick(data,fileRouter.push)
 		}}/>;
 	}
 
@@ -101,33 +92,18 @@ function Manager({ open, onClose }) {
 							size="small"
 							aria-label="delete"
 							onClick={(e) => {
-								back();
+								fileRouter.back();
 							}}
-							disabled={!isBack}
+							disabled={!fileRouter.isBack}
 						>
 							<ChevronLeft />
 						</Fab>
-						<Breadcrumbs path={href} onChange={push} onMenu={e=>setAnchorEl(e.target)} />
+						<Breadcrumbs path={fileRouter.path} onChange={fileRouter.push} />
 					</Actions>
 					{loading && <LinearProgress />}
 				</DialogTitle>
 				<DialogContent>
-					<ItemMenu  
-					anchorEl={anchorEl}
-					handleOpen={e=>{
-						let item={
-							type:anchorEl.getAttribute('d_type'),
-							filename:anchorEl.getAttribute('d_filename'),
-							basename:anchorEl.getAttribute('d_basename')
-						}
-						handleFileClick(item,push)
-						setAnchorEl(null);
-					}} 
-					handleMenuClose={e=>{
-
-					}}
-					/>
-					<Contents>
+					<Contents  >
 						{gridList.length > 0 && (
 							<Grid
 								cellRenderer={cellRenderer}
@@ -141,15 +117,9 @@ function Manager({ open, onClose }) {
 						)}
 					</Contents>
 				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleClose} color="primary">
-						取消
-					</Button>
-					<Button onClick={handleClose} color="primary" autoFocus>
-						确定
-					</Button>
-				</DialogActions>
+				
 			</Dialog>
+			{menu.data && <ItemMenu  {...menu} />}
 		</div>
 	);
 }
