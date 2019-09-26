@@ -76,7 +76,7 @@ export function getIcon(item){
 	}
 }
 //处理文件打开
-export function handleFileClick(item,push){
+export function onOpen(item,push){
 	function openWindow(e){
 		window.open(`http://home.tangzuo.cc:8282${item.filename}`, '_blank');
 	}
@@ -123,6 +123,6 @@ const BastItem=React.memo(function({ style,active,data,...other }) {
 			</div>
 		</File>
 	);
-},(prevProps, nextProps) =>prevProps.active==nextProps.active)
+},(p, n) =>(p.active==n.active && p.style == n.style))
 
 export default BastItem;
