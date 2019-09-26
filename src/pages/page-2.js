@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getDirContents } from '../utils/webdav';
 import { useAutoQuery } from '../utils/query';
-import { chunkList } from '../utils/public';
+
 import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
 
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Breadcrumbs from '../components/fileManager/Breadcrumbs';
@@ -17,38 +16,32 @@ import useFileRouter from '../components/fileManager/FileRouter';
 import { Grid } from 'react-virtualized';
 
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import SortBtn, { useFileSort } from '../components/fileManager/Sort';
 
 const Contents = styled.div``;
 
 const Actions = styled.div`display: flex;`;
 
-function Page2({ open, onClose }) {
+const Right = styled.div`margin-left: auto;`;
+
+function Manager({ open, onClose }) {
 	//ui主题
 	const theme = useTheme();
 	//文件管理器路由
 	const fileRouter = useFileRouter();
 	//选择的文件
 	const [ select, setSelect ] = useState({});
-	//文件列表数据
-	const [ gridList, setGridList ] = useState([]);
+
 	//请求接口
 	const { data, loading } = useAutoQuery(getDirContents, {
 		path: fileRouter.path
 	});
 	const columnLen = 5;
-	useEffect(
-		() => {
-			if (data.list) {
-				let dirList = data.list ? data.list.slice(1) : [];
-				setGridList(chunkList(dirList, columnLen));
-			}
-		},
-		[ data.list ]
-	);
+	//设置列表数据
+	const { gridList, sort, sortIndex, setSortIndex, sortObj } = useFileSort(data.list, columnLen);
+
+	//媒体查询是否需要全屏显示
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-	function handleClose(e) {
-		onClose();
-	}
 
 	const menu = useMenu({
 		onOpen(data) {
@@ -93,6 +86,9 @@ function Page2({ open, onClose }) {
 					<ChevronLeft />
 				</Fab>
 				<Breadcrumbs path={fileRouter.path} onChange={fileRouter.push} />
+				<Right>
+					<SortBtn sortIndex={sortIndex} sortObj={sortObj} setSortIndex={setSortIndex} />
+				</Right>
 			</Actions>
 			{loading && <LinearProgress />}
 			<Contents>
@@ -113,4 +109,4 @@ function Page2({ open, onClose }) {
 	);
 }
 
-export default Page2;
+export default Manager;
