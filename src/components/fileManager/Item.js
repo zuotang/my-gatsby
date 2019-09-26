@@ -99,7 +99,7 @@ export function handleFileClick(item,push){
 }
 
 
-const BastItem=React.memo(function({ onOpen,onSelect,onFocus,onBlur,style,active,data,...other }) {
+const BastItem=React.memo(function({ style,active,data,...other }) {
 	let icon=getIcon(data);
 	let iconElement;
 	//图标渲染

@@ -67,6 +67,7 @@ function Manager({ open, onClose }) {
 		style={style}  
 		data={data}
 		onFocus={e=>{
+			console.log('test',data)
 			setSelect({[data.filename]:data})
 		}}
 		onBlur={e=>{
