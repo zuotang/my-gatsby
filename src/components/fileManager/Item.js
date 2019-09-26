@@ -99,7 +99,7 @@ export function handleFileClick(item,push){
 }
 
 
-const BastItem=React.memo(function({ onOpen,onSelect, style,active,data }) {
+const BastItem=React.memo(function({ onOpen,onSelect,onFocus,onBlur,style,active,data,...other }) {
 	let icon=getIcon(data);
 	let iconElement;
 	//图标渲染
@@ -115,15 +115,14 @@ const BastItem=React.memo(function({ onOpen,onSelect, style,active,data }) {
 			d_basename={data.basename} 
 			d_filename={data.filename} 
 			tabIndex="0" 
-			className={calssNames("item",active && 'active')} 
-			onDoubleClick={onOpen} 
-			onClick={onSelect}
+			className={calssNames("item",active && 'active')}
+			{...other}
 			draggable >
 				{iconElement}
 				<div className="title">{data.basename}</div>
 			</div>
 		</File>
 	);
-},()=>true)
+},(prevProps, nextProps) =>prevProps.active==nextProps.active)
 
 export default BastItem;

@@ -4,7 +4,7 @@ import FileManager from '../components/fileManager/Manager';
 import Button from '@material-ui/core/Button';
 
 const IndexPage = () => {
-	const [ open, setOpen ] = useState(false);
+	const [ open, setOpen ] = useState(true);
 	return (
 		<Layout autoSize={false}>
 			<Button variant="outlined" color="primary" onClick={(e) => setOpen(true)}>

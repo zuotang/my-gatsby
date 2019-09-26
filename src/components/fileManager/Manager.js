@@ -30,13 +30,12 @@ const Actions = styled.div`display: flex;`;
 function Manager({ open, onClose }) {
 	//ui主题
 	const theme = useTheme();
+	//文件管理器路由
 	const fileRouter=useFileRouter();
 	//选择的文件
 	const [select,setSelect]=useState({});
-
 	//文件列表数据
 	const [ gridList, setGridList ] = useState([]);
-	
 	//请求接口
 	const { data, loading } = useAutoQuery(getDirContents, {
 		path: fileRouter.path
@@ -51,17 +50,14 @@ function Manager({ open, onClose }) {
 		},
 		[ data.list ]
 	);
-	
-	
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
 	function handleClose(e) {
 		onClose();
 	}
 
 	const menu=useMenu(fileRouter.push);
 
-
+	//渲染项
 	function cellRenderer({ columnIndex, key, rowIndex, style }) {
 		let data = gridList[rowIndex][columnIndex];
 		if (!data) return null;
@@ -69,16 +65,14 @@ function Manager({ open, onClose }) {
 		active={!!select[data.filename]}
 		key={data.filename} 
 		style={style}  
-		data={data} 
-		onSelect={e=>{
-			//是否被选择
-			if(!select[data.filename]){
-				setSelect({...select,[data.filename]:data});
-			}else{
-				setSelect({...select,[data.filename]:null});
-			}
+		data={data}
+		onFocus={e=>{
+			setSelect({[data.filename]:data})
 		}}
-		onOpen={e=>{
+		onBlur={e=>{
+			setSelect({[data.filename]:null})
+		}}
+		onDoubleClick={e=>{
 			handleFileClick(data,fileRouter.push)
 		}}/>;
 	}
@@ -119,7 +113,7 @@ function Manager({ open, onClose }) {
 				</DialogContent>
 				
 			</Dialog>
-			{menu.data && <ItemMenu  {...menu} />}
+			{menu.data && <ItemMenu  {...menu}  />}
 		</div>
 	);
 }

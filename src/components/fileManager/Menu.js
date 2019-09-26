@@ -30,11 +30,14 @@ export function useMenu(push){
             e.preventDefault();
 			//右键菜单处理
 			if(target && target.getAttribute('d_type')){
-                //数据
-                setData({
+                let resData={
                     type:target.getAttribute('d_type'),
                     filename:target.getAttribute('d_filename'),
                     basename:target.getAttribute('d_basename'),
+                }
+                //数据
+                setData({
+                    ...resData,
                     x:e.clientX,
                     y:e.clientY
                 })
@@ -57,7 +60,7 @@ export function useMenu(push){
     return {handleOpen,handleMenuClose,data}
 }
 
-export const ItemMenu=React.memo(function({data,handleOpen,handleMenuClose}){
+export const ItemMenu=React.memo(function({data,handleOpen,handleMenuClose,onSelect}){
     const menuEl = useRef(null);
     useEffect(()=>{
         function handleMouseDown(e){
