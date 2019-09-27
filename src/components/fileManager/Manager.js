@@ -41,7 +41,7 @@ function Manager({ open, onClose }) {
 		path: fileRouter.path
 	});
 	const columnLen = 5;
-	//设置列表数据
+	//排序
 	const { gridList, sort, sortIndex, setSortIndex, sortObj } = useFileSort(data.list, columnLen);
 
 	//媒体查询是否需要全屏显示
