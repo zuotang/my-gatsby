@@ -8,11 +8,17 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
+import {fileStore} from './Manager';
 
 import Grow from '@material-ui/core/Grow';
 import styled from 'styled-components';
 
-const Menu = styled(Paper)`
+
+const FileMenu = styled(Paper)`
     position:fixed;
     background:white;
     z-index:99999;
@@ -20,27 +26,27 @@ const Menu = styled(Paper)`
     left:${(p) => p.position.x - 5}px;
 `;
 
-export function useMenu({ onOpen }) {
+export const ItemMenu = React.memo(function() {
 	const [ data, setData ] = useState(null);
-
+	const [position,setPosition]=useState({x:0,y:0});
 	useEffect(() => {
 		//鼠标右键菜单
 		function handleContextMenu(e) {
 			let target = document.activeElement;
 			e.preventDefault();
+			let filename=target && target.getAttribute('d_filename')
 			//右键菜单处理
-			if (target && target.getAttribute('d_type')) {
-				let resData = {
-					type: target.getAttribute('d_type'),
-					filename: target.getAttribute('d_filename'),
-					basename: target.getAttribute('d_basename')
-				};
-				//数据
-				setData({
-					...resData,
-					x: e.clientX,
-					y: e.clientY
-				});
+			if (filename) {
+				let resData = fileStore.source[filename]
+				function open(){
+					//数据
+					setData(resData);
+					setPosition({
+						x: e.clientX,
+						y: e.clientY
+					});
+				}
+				setTimeout(open,60)
 			} else {
 				setData(null);
 			}
@@ -51,23 +57,11 @@ export function useMenu({ onOpen }) {
 		};
 	}, []);
 
-	function handleMenuClose() {
-		setData(null);
-	}
-
-	function handleOpen() {
-		onOpen(data);
-		handleMenuClose();
-	}
-	return { handleOpen, handleMenuClose, data };
-}
-
-export const ItemMenu = React.memo(function({ data, handleOpen, handleMenuClose, onSelect }) {
 	//用来添加鼠标按下事件
 	const menuEl = useRef(null);
 	useEffect(() => {
 		function handleMouseDown(e) {
-			handleMenuClose();
+			setData(null);
 		}
 		//点击菜单项时不隐藏菜单
 		function handleMenu(e) {
@@ -84,9 +78,12 @@ export const ItemMenu = React.memo(function({ data, handleOpen, handleMenuClose,
 	}, []);
 	return (
 		<Grow in={!!data} style={{ transformOrigin: '0 0 0' }}>
-			<Menu position={{ x: data.x, y: data.y }} ref={menuEl}>
+			<FileMenu position={position} ref={menuEl}>
 				<List component="nav" aria-label="main mailbox folders">
-					<ListItem button onClick={handleOpen}>
+					<ListItem button onClick={e=>{
+						fileStore.open(data);
+						setData(null);
+					}}>
 						<ListItemIcon>
 							<InboxIcon />
 						</ListItemIcon>
@@ -105,7 +102,40 @@ export const ItemMenu = React.memo(function({ data, handleOpen, handleMenuClose,
 						<ListItemText primary="属性" />
 					</ListItem>
 				</List>
-			</Menu>
+			</FileMenu>
 		</Grow>
 	);
 });
+
+
+
+// 文件夹菜单
+export function DirMenu({children}) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+	  {children && children(handleClick)}
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleClose}>新建</MenuItem>
+        <MenuItem onClick={handleClose}>上传</MenuItem>
+        <MenuItem onClick={handleClose}>更名</MenuItem>
+        <MenuItem onClick={handleClose}>属性</MenuItem>
+      </Menu>
+    </div>
+  );
+}

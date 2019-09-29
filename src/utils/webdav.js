@@ -8,11 +8,16 @@ const client = createClient('/', {
 	password: 'wysj3910'
 });
 
+//获取文件夹列表
 export async function getDirContents({ path }) {
 	let res = await client.getDirectoryContents(url(path));
 	return { list: res };
 }
 
+//新建文件
+export async function addDir(path){
+	return await client.createDirectory(path);
+}
 
 //arrayBuffer 转 Base64
 function transformArrayBufferToBase64 (buffer) {

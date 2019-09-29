@@ -36,7 +36,7 @@ export function useFileSort(list, columnLen) {
 		},
 		[ list, sortIndex ]
 	);
-	return { gridList, sortIndex, setSortIndex, sort: sortObj[sortIndex], sortObj };
+	return { gridList, sortIndex, setSortIndex, sort: sortObj[sortIndex], sortObj,setGridList };
 }
 
 export default function SortBtn({ sortIndex, sortObj, setSortIndex }) {

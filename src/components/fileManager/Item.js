@@ -112,7 +112,6 @@ const BastItem=React.memo(function({ style,active,data,...other }) {
 		<File style={style}   >
 			<div 
 			d_type={data.type} 
-			d_basename={data.basename} 
 			d_filename={data.filename} 
 			tabIndex="0" 
 			className={calssNames("item",active && 'active')}

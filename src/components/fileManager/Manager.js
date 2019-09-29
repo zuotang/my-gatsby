@@ -14,8 +14,9 @@ import Fab from '@material-ui/core/Fab';
 import BastItem, { onOpen } from './Item';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
-import { ItemMenu, useMenu } from './Menu';
+import { ItemMenu } from './Menu';
 import useFileRouter from './FileRouter';
+import NameDialog from './NameDialog'
 
 import { Grid } from 'react-virtualized';
 
@@ -28,6 +29,13 @@ const Actions = styled.div`display: flex;`;
 
 const Right = styled.div`margin-left: auto;`;
 
+
+//所有文件数据塞入fileStore,通过filename作为key
+export let fileStore={
+	source:{},
+};
+
+
 function Manager({ open, onClose }) {
 	//ui主题
 	const theme = useTheme();
@@ -37,22 +45,43 @@ function Manager({ open, onClose }) {
 	const [ select, setSelect ] = useState({});
 
 	//请求接口
-	const { data, loading } = useAutoQuery(getDirContents, {
+	const { data, loading,updateCache } = useAutoQuery(getDirContents, {
 		path: fileRouter.path
 	});
+
+	//注册到全局对象中方便调用
+	//添加文件夹
+	fileStore.addDir=function(){
+		
+	}
+	//删除文件或文件夹
+	fileStore.delFile=function (){
+
+	}
+	//修改文件名称
+	fileStore.rename=function (){
+
+	}
+	fileStore.open=function(fileItem){
+		onOpen(fileItem, fileRouter.push);
+	}
+	
+	useEffect(()=>{
+		if(data.list){
+			fileStore.source={};
+			for(let i in data.list){
+				let item=data.list[i];
+				fileStore.source[item.filename]=item;
+			}
+		}
+	},[data.list])
 	const columnLen = 5;
 	//排序
 	const { gridList, sort, sortIndex, setSortIndex, sortObj } = useFileSort(data.list, columnLen);
 
 	//媒体查询是否需要全屏显示
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-	const menu = useMenu({
-		onOpen(data) {
-			onOpen(data, fileRouter.push);
-		}
-	});
-
+	
 	//渲染项
 	function cellRenderer({ columnIndex, key, rowIndex, style }) {
 		let data = gridList[rowIndex][columnIndex];
@@ -78,6 +107,7 @@ function Manager({ open, onClose }) {
 
 	return (
 		<div>
+			
 			<Dialog fullScreen={fullScreen} open={open} onClose={onClose} maxWidth={'xl'}>
 				<DialogTitle id="alert-dialog-title">
 					<Actions>
@@ -91,7 +121,10 @@ function Manager({ open, onClose }) {
 						>
 							<ChevronLeft />
 						</Fab>
-						<Breadcrumbs path={fileRouter.path} onChange={fileRouter.push} />
+						<Breadcrumbs 
+						path={fileRouter.path} 
+						onChange={fileRouter.push}
+						/>
 						<Right>
 							<SortBtn sortIndex={sortIndex} sortObj={sortObj} setSortIndex={setSortIndex} />
 						</Right>
@@ -111,10 +144,11 @@ function Manager({ open, onClose }) {
 								width={820}
 							/>
 						)}
+						<NameDialog />
 					</Contents>
 				</DialogContent>
 			</Dialog>
-			{menu.data && <ItemMenu {...menu} />}
+			 <ItemMenu  />
 		</div>
 	);
 }

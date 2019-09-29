@@ -42,7 +42,11 @@ function useBaseFetch(ql) {
 		setData(res);
 		return res;
 	}
-	return { fetch, data, loading, error, setError };
+	//更新缓存数据
+	function updateCache(fun){
+		setData(fun(data))
+	}
+	return { fetch, data, loading, error, setError,updateCache };
 }
 export function useQuery(ql) {
 	return useBaseFetch(ql);

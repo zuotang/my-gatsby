@@ -6,6 +6,7 @@ import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import HomeIcon from '@material-ui/icons/Home';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {DirMenu} from './Menu';
 
 const StyledBreadcrumb = withStyles((theme) => ({
 	root: {
@@ -46,9 +47,11 @@ function getPathList(path) {
 			path = path.substring(0, index);
 		}
 	}
+	list.unshift({name:"home",path:'/'})
 	return list;
 }
 
+//面包屑导航
 export default function CustomizedBreadcrumbs({ path, onChange,onMenu }) {
 	const classes = useStyles();
 	let pathList = getPathList(path);
@@ -58,43 +61,43 @@ export default function CustomizedBreadcrumbs({ path, onChange,onMenu }) {
 		onChange(path);
 	}
 
+	function showIcon(item){
+		if(item.path=='/'){
+			return (
+				<Avatar className={classes.avatar}>
+					<HomeIcon />
+				</Avatar>)
+		}
+	}
+	 
 	return (
 		<Paper elevation={0} className={classes.root}>
 			<Breadcrumbs aria-label="breadcrumb">
-				<StyledBreadcrumb
-					component="a"
-					href="#"
-					label="Home"
-					avatar={
-						<Avatar className={classes.avatar}>
-							<HomeIcon />
-						</Avatar>
-					}
-					onClick={(e) => handleClick(e, '/')}
-				/>
-
 				{pathList.map((item, key) => {
 					return (
 						<StyledBreadcrumb
 							key={item.path}
 							component="a"
 							href="#"
+							avatar={showIcon(item)}
 							label={item.name}
 							onClick={(e) => handleClick(e, item.path)}
 						/>
 					);
 				})}
-
-				{current && (
-					<StyledBreadcrumb
-						label={current.name}
-						deleteIcon={<ExpandMoreIcon />}
-						onDelete={onMenu}
-					/>
-				)}
+				{current && <DirMenu>
+					{(onOpen)=>(
+						<StyledBreadcrumb
+							avatar={showIcon(current)}
+							label={current.name}
+							deleteIcon={<ExpandMoreIcon />}
+							onDelete={onOpen}
+							onClick={onOpen}
+						/>
+					)}
+				</DirMenu>}
 			</Breadcrumbs>
 		</Paper>
 	);
 }
 
-/*onDelete={handleClick} onClick={(e) => handleClick(e, current.path)}*/
