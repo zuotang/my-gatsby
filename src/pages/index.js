@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 const IndexPage = () => {
 	const [ open, setOpen ] = useState(true);
 	return (
-		<Layout autoSize={false}>
+		<Layout >
 			<Button variant="outlined" color="primary" onClick={(e) => setOpen(true)}>
 				文件管理
 			</Button>
