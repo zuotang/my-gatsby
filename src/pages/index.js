@@ -7,7 +7,7 @@ const IndexPage = () => {
 	const [ open, setOpen ] = useState(true);
 	return (
 		<Layout >
-			<Button variant="outlined" color="primary" onClick={(e) => setOpen(true)}>
+			<Button variant="contained" color="primary" onClick={(e) => setOpen(true)}>
 				文件管理
 			</Button>
 			<FileManager open={open} onClose={(e) => setOpen(false)} />

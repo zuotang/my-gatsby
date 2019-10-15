@@ -1,16 +1,3 @@
-// import React from 'react';
-// import './layout.css'
-// //import baseSize from '../components/baseSize';
-// function Layout({children}){
-  
-//   return <>
-//     {children}
-//   </>
-// }
-
-// export default Layout
-
-
 import React from 'react';
 import './layout.css'
 import clsx from 'clsx';
@@ -30,7 +17,15 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import styled from 'styled-components';
 
+let Logo=styled.div`
+  font-size:20px;
+  padding-left:10px;
+  font-weight:bold;
+  color:#5e72e4;
+`
 
 function Copyright() {
   return (
@@ -45,6 +40,22 @@ function Copyright() {
   );
 }
 
+function ElevationScroll(props) {
+  const { children, window } = props;
+  // Note that you normally won't need to set the window ref as useScrollTrigger
+  // will default to window.
+  // This is only being set here because the demo is in an iframe.
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+    target: window ? window() : undefined,
+  });
+
+  return React.cloneElement(children, {
+    elevation: trigger ? 4 : 0,
+  });
+}
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -57,7 +68,7 @@ const useStyles = makeStyles(theme => ({
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
@@ -117,7 +128,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Dashboard({children}) {
+export default function Dashboard(props) {
+  let {children}=props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -130,7 +142,8 @@ export default function Dashboard({children}) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+      <ElevationScroll {...props}>
+      <AppBar  position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
         <Toolbar className={classes.toolbar}>
           <IconButton
             edge="start"
@@ -142,7 +155,7 @@ export default function Dashboard({children}) {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            任务平台-管理系统
+            首页
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
@@ -151,6 +164,7 @@ export default function Dashboard({children}) {
           </IconButton>
         </Toolbar>
       </AppBar>
+      </ElevationScroll>
       <Drawer
         variant="permanent"
         classes={{
@@ -159,11 +173,13 @@ export default function Dashboard({children}) {
         open={open}
       >
         <div className={classes.toolbarIcon}>
+          <Logo>任务平台</Logo>
           <IconButton onClick={handleDrawerClose}>
+           
             <ChevronLeftIcon />
           </IconButton>
         </div>
-        <Divider />
+        
         <List>{mainListItems}</List>
         <Divider />
         <List>{secondaryListItems}</List>

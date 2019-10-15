@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
-    "@material-ui/core": "^4.4.2",
-    "@material-ui/icons": "^4.4.1",
+    "@material-ui/core": "^4.5.1",
+    "@material-ui/icons": "^4.5.1",
     "babel-plugin-styled-components": "^1.10.6",
     "cannon": "^0.6.2",
     "classnames": "^2.2.6",
