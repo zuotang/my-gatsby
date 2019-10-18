@@ -186,9 +186,10 @@ export default function Dashboard(props) {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        {children}
+        {/* <Container  className={classes.container}>
           {children}
-        </Container>
+        </Container> */}
         <Copyright />
       </main>
     </div>

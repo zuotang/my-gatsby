@@ -26,7 +26,7 @@ const theme = createMuiTheme({
     },
     MuiDrawer:{
       paperAnchorDockedLeft:{
-        borderRight: 0
+        // borderRight: 0
       }
     }
   },
