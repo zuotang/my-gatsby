@@ -35,7 +35,7 @@
     "prettier": "^1.18.2",
     "react-three": "^0.9.7",
     "react-three-fiber": "^2.3.6",
-    "three": "^0.107.0"
+    "three": "^0.137.0"
   },
   "keywords": [
     "gatsby"
